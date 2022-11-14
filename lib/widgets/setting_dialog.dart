@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sleep_soundly/utils/constant.dart';
 
 class SettingDialog extends StatefulWidget {
@@ -27,17 +28,28 @@ class _SettingDialog extends State<SettingDialog> {
                 ),
               );
             }).toList()),
+            const SizedBox(height: 16),
+            TextFormField(
+              initialValue: '60',
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'Time (minutes)',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
           ],
         ),
       ),
-      // actions: <Widget>[
-      //   TextButton(
-      //     child: const Text('Save'),
-      //     onPressed: () {
-      //       Navigator.of(context).pop();
-      //     },
-      //   ),
-      // ],
+      actions: <Widget>[
+        TextButton(
+          child: const Text('Save'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
     );
   }
 }
