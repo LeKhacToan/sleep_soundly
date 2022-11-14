@@ -37,6 +37,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   lottie: ^2.0.0
+  audioplayers: ^1.1.1
 
 dev_dependencies:
   flutter_test:
@@ -66,7 +67,12 @@ flutter:
     - assets/river.json
     - assets/rainy.json
     - assets/forest.json
-    - assests/countryside.jpg
+    - assets/countryside.jpg
+    - assets/sounds/river.mp3
+    - assets/sounds/ocean.mp3
+    - assets/sounds/rain.mp3
+    - assets/sounds/forest.mp3
+    - assets/sounds/countryside.mp3
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
