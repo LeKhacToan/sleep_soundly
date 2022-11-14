@@ -30,14 +30,14 @@ class _SettingDialog extends State<SettingDialog> {
           ],
         ),
       ),
-      actions: <Widget>[
-        TextButton(
-          child: const Text('Save'),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ],
+      // actions: <Widget>[
+      //   TextButton(
+      //     child: const Text('Save'),
+      //     onPressed: () {
+      //       Navigator.of(context).pop();
+      //     },
+      //   ),
+      // ],
     );
   }
 }
