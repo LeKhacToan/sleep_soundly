@@ -55,15 +55,13 @@ class _HomePage extends State<HomePage> {
       '${((timerMaxSeconds - currentSeconds) ~/ 60).toString().padLeft(2, '0')}:${((timerMaxSeconds - currentSeconds) % 60).toString().padLeft(2, '0')}';
 
   startTimeout() {
-    setState(() {
-      controlTime = Timer.periodic(const Duration(seconds: 1), (timer) {
-        setState(() {
-          currentSeconds = timer.tick;
-          if (timer.tick >= timerMaxSeconds) {
-            timer.cancel();
-            audioPlayer.pause();
-          }
-        });
+    controlTime = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        currentSeconds = timer.tick;
+        if (timer.tick >= timerMaxSeconds) {
+          timer.cancel();
+          audioPlayer.pause();
+        }
       });
     });
   }
@@ -73,7 +71,6 @@ class _HomePage extends State<HomePage> {
       item = value;
     });
     controlTime?.cancel();
-    startTimeout();
     audioPlayer.pause();
     audioPlayer.setSourceAsset(item['mp3']);
     // await audioPlayer.resume();
