@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_soundly/utils/constant.dart';
 
 class SettingDialog extends StatefulWidget {
-  const SettingDialog({super.key, required this.onSelect});
+  const SettingDialog(
+      {super.key, required this.onSelect, required this.selectedId});
+  final int selectedId;
   final Function(Map<String, dynamic> value) onSelect;
 
   @override
@@ -11,6 +13,21 @@ class SettingDialog extends StatefulWidget {
 }
 
 class _SettingDialog extends State<SettingDialog> {
+  int? time;
+  final TextEditingController timeText = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    getTime();
+  }
+
+  getTime() async {
+    final prefs = await SharedPreferences.getInstance();
+    time = prefs.getInt('time') ?? 60;
+    timeText.text = time.toString();
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -22,15 +39,34 @@ class _SettingDialog extends State<SettingDialog> {
                 children: kMedia.map((item) {
               return Padding(
                 padding: const EdgeInsets.only(right: 4),
-                child: ElevatedButton(
-                  onPressed: () => widget.onSelect(item),
-                  child: Text(item['title'] as String),
-                ),
+                child: item['id'] == widget.selectedId
+                    ? ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          widget.onSelect(item);
+                        },
+                        child: Text(item['title'] as String),
+                      )
+                    : OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          shape: const StadiumBorder(),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          widget.onSelect(item);
+                        },
+                        child: Text(item['title'] as String),
+                      ),
               );
             }).toList()),
             const SizedBox(height: 16),
             TextFormField(
-              initialValue: '60',
+              controller: timeText,
+              onChanged: (text) async {
+                final prefs = await SharedPreferences.getInstance();
+                int time = text.isEmpty ? 60 : int.parse(text);
+                await prefs.setInt('time', time);
+              },
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 labelText: 'Time (minutes)',
@@ -42,14 +78,14 @@ class _SettingDialog extends State<SettingDialog> {
           ],
         ),
       ),
-      actions: <Widget>[
-        TextButton(
-          child: const Text('Save'),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ],
+      // actions: <Widget>[
+      //   TextButton(
+      //     child: const Text('Save'),
+      //     onPressed: () {
+      //       Navigator.of(context).pop();
+      //     },
+      //   ),
+      // ],
     );
   }
 }

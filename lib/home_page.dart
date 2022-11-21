@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:sleep_soundly/widgets/setting_dialog.dart';
 import 'package:sleep_soundly/utils/constant.dart';
@@ -17,11 +20,15 @@ class _HomePage extends State<HomePage> {
   Map<String, dynamic> item = kMedia[0];
   AudioPlayer audioPlayer = AudioPlayer();
   bool isPlaying = false;
+  int timerMaxSeconds = 60;
+  int currentSeconds = 0;
+  Timer? controlTime;
 
   @override
   void initState() {
     super.initState();
 
+    setTime();
     audioPlayer.setReleaseMode(ReleaseMode.loop);
     audioPlayer.onPlayerStateChanged.listen((event) {
       setState(() {
@@ -36,10 +43,37 @@ class _HomePage extends State<HomePage> {
     super.dispose();
   }
 
+  void setTime() async {
+    final prefs = await SharedPreferences.getInstance();
+    int time = prefs.getInt('time') ?? 60;
+    setState(() {
+      timerMaxSeconds = time * 60;
+    });
+  }
+
+  String get timerText =>
+      '${((timerMaxSeconds - currentSeconds) ~/ 60).toString().padLeft(2, '0')}:${((timerMaxSeconds - currentSeconds) % 60).toString().padLeft(2, '0')}';
+
+  startTimeout() {
+    setState(() {
+      controlTime = Timer.periodic(const Duration(seconds: 1), (timer) {
+        setState(() {
+          currentSeconds = timer.tick;
+          if (timer.tick >= timerMaxSeconds) {
+            timer.cancel();
+            audioPlayer.pause();
+          }
+        });
+      });
+    });
+  }
+
   Future<void> handleSelectSound(value) async {
     setState(() {
       item = value;
     });
+    controlTime?.cancel();
+    startTimeout();
     audioPlayer.pause();
     audioPlayer.setSourceAsset(item['mp3']);
     await audioPlayer.resume();
@@ -48,18 +82,22 @@ class _HomePage extends State<HomePage> {
   Future<void> controlPlayer() async {
     if (isPlaying) {
       audioPlayer.pause();
+      controlTime?.cancel();
     } else {
+      startTimeout();
       audioPlayer.setSourceAsset(item['mp3']);
       await audioPlayer.resume();
     }
   }
 
-  showSettingDialog() {
-    return showDialog(
+  showSettingDialog() async {
+    await showDialog(
         context: context,
         builder: (BuildContext context) {
-          return SettingDialog(onSelect: handleSelectSound);
+          return SettingDialog(
+              selectedId: item['id'], onSelect: handleSelectSound);
         });
+    setTime();
   }
 
   @override
@@ -84,6 +122,13 @@ class _HomePage extends State<HomePage> {
           Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 40),
+                child: Text(
+                  timerText,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
               FloatingActionButton(
                 heroTag: 'play',
                 onPressed: controlPlayer,
