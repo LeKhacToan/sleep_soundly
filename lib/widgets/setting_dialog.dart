@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_soundly/utils/constant.dart';
 
 class SettingDialog extends StatefulWidget {
@@ -12,6 +13,21 @@ class SettingDialog extends StatefulWidget {
 }
 
 class _SettingDialog extends State<SettingDialog> {
+  int? time;
+  final TextEditingController timeText = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    getTime();
+  }
+
+  getTime() async {
+    final prefs = await SharedPreferences.getInstance();
+    time = prefs.getInt('time') ?? 60;
+    timeText.text = time.toString();
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -45,7 +61,12 @@ class _SettingDialog extends State<SettingDialog> {
             }).toList()),
             const SizedBox(height: 16),
             TextFormField(
-              initialValue: '60',
+              controller: timeText,
+              onChanged: (text) async {
+                final prefs = await SharedPreferences.getInstance();
+                int time = text.isEmpty ? 60 : int.parse(text);
+                await prefs.setInt('time', time);
+              },
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 labelText: 'Time (minutes)',
