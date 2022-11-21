@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:sleep_soundly/utils/constant.dart';
 
 class SettingDialog extends StatefulWidget {
-  const SettingDialog({super.key, required this.onSelect});
+  const SettingDialog(
+      {super.key, required this.onSelect, required this.selectedId});
+  final int selectedId;
   final Function(Map<String, dynamic> value) onSelect;
 
   @override
@@ -22,10 +23,24 @@ class _SettingDialog extends State<SettingDialog> {
                 children: kMedia.map((item) {
               return Padding(
                 padding: const EdgeInsets.only(right: 4),
-                child: ElevatedButton(
-                  onPressed: () => widget.onSelect(item),
-                  child: Text(item['title'] as String),
-                ),
+                child: item['id'] == widget.selectedId
+                    ? ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          widget.onSelect(item);
+                        },
+                        child: Text(item['title'] as String),
+                      )
+                    : OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          shape: const StadiumBorder(),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          widget.onSelect(item);
+                        },
+                        child: Text(item['title'] as String),
+                      ),
               );
             }).toList()),
             const SizedBox(height: 16),
@@ -42,14 +57,14 @@ class _SettingDialog extends State<SettingDialog> {
           ],
         ),
       ),
-      actions: <Widget>[
-        TextButton(
-          child: const Text('Save'),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ],
+      // actions: <Widget>[
+      //   TextButton(
+      //     child: const Text('Save'),
+      //     onPressed: () {
+      //       Navigator.of(context).pop();
+      //     },
+      //   ),
+      // ],
     );
   }
 }

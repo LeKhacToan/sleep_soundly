@@ -58,7 +58,8 @@ class _HomePage extends State<HomePage> {
     return showDialog(
         context: context,
         builder: (BuildContext context) {
-          return SettingDialog(onSelect: handleSelectSound);
+          return SettingDialog(
+              selectedId: item['id'], onSelect: handleSelectSound);
         });
   }
 
