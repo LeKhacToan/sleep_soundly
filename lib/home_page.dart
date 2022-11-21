@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -17,6 +19,9 @@ class _HomePage extends State<HomePage> {
   Map<String, dynamic> item = kMedia[0];
   AudioPlayer audioPlayer = AudioPlayer();
   bool isPlaying = false;
+  final int timerMaxSeconds = 60;
+  int currentSeconds = 0;
+  Timer? controlTime;
 
   @override
   void initState() {
@@ -36,10 +41,28 @@ class _HomePage extends State<HomePage> {
     super.dispose();
   }
 
+  String get timerText =>
+      '${((timerMaxSeconds - currentSeconds) ~/ 60).toString().padLeft(2, '0')}:${((timerMaxSeconds - currentSeconds) % 60).toString().padLeft(2, '0')}';
+
+  startTimeout() {
+    setState(() {
+      controlTime = Timer.periodic(const Duration(seconds: 1), (timer) {
+        setState(() {
+          currentSeconds = timer.tick;
+          if (timer.tick >= timerMaxSeconds) {
+            timer.cancel();
+            audioPlayer.pause();
+          }
+        });
+      });
+    });
+  }
+
   Future<void> handleSelectSound(value) async {
     setState(() {
       item = value;
     });
+    startTimeout();
     audioPlayer.pause();
     audioPlayer.setSourceAsset(item['mp3']);
     await audioPlayer.resume();
@@ -48,7 +71,9 @@ class _HomePage extends State<HomePage> {
   Future<void> controlPlayer() async {
     if (isPlaying) {
       audioPlayer.pause();
+      controlTime?.cancel();
     } else {
+      startTimeout();
       audioPlayer.setSourceAsset(item['mp3']);
       await audioPlayer.resume();
     }
@@ -85,6 +110,13 @@ class _HomePage extends State<HomePage> {
           Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 40),
+                child: Text(
+                  timerText,
+                  style: Theme.of(context).textTheme.bodyText1,
+                ),
+              ),
               FloatingActionButton(
                 heroTag: 'play',
                 onPressed: controlPlayer,
