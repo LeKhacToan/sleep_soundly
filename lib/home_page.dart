@@ -62,6 +62,7 @@ class _HomePage extends State<HomePage> {
     setState(() {
       item = value;
     });
+    controlTime?.cancel();
     startTimeout();
     audioPlayer.pause();
     audioPlayer.setSourceAsset(item['mp3']);
@@ -114,7 +115,7 @@ class _HomePage extends State<HomePage> {
                 padding: const EdgeInsets.symmetric(vertical: 40),
                 child: Text(
                   timerText,
-                  style: Theme.of(context).textTheme.bodyText1,
+                  style: const TextStyle(color: Colors.white),
                 ),
               ),
               FloatingActionButton(
