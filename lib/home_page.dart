@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:sleep_soundly/widgets/setting_dialog.dart';
 import 'package:sleep_soundly/utils/constant.dart';
@@ -19,7 +20,7 @@ class _HomePage extends State<HomePage> {
   Map<String, dynamic> item = kMedia[0];
   AudioPlayer audioPlayer = AudioPlayer();
   bool isPlaying = false;
-  final int timerMaxSeconds = 60;
+  int timerMaxSeconds = 60;
   int currentSeconds = 0;
   Timer? controlTime;
 
@@ -27,6 +28,7 @@ class _HomePage extends State<HomePage> {
   void initState() {
     super.initState();
 
+    setTime();
     audioPlayer.setReleaseMode(ReleaseMode.loop);
     audioPlayer.onPlayerStateChanged.listen((event) {
       setState(() {
@@ -39,6 +41,14 @@ class _HomePage extends State<HomePage> {
   void dispose() {
     audioPlayer.dispose();
     super.dispose();
+  }
+
+  void setTime() async {
+    final prefs = await SharedPreferences.getInstance();
+    int time = prefs.getInt('time') ?? 60;
+    setState(() {
+      timerMaxSeconds = time * 60;
+    });
   }
 
   String get timerText =>
@@ -80,13 +90,14 @@ class _HomePage extends State<HomePage> {
     }
   }
 
-  showSettingDialog() {
-    return showDialog(
+  showSettingDialog() async {
+    await showDialog(
         context: context,
         builder: (BuildContext context) {
           return SettingDialog(
               selectedId: item['id'], onSelect: handleSelectSound);
         });
+    setTime();
   }
 
   @override
