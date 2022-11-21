@@ -76,7 +76,7 @@ class _HomePage extends State<HomePage> {
     startTimeout();
     audioPlayer.pause();
     audioPlayer.setSourceAsset(item['mp3']);
-    await audioPlayer.resume();
+    // await audioPlayer.resume();
   }
 
   Future<void> controlPlayer() async {

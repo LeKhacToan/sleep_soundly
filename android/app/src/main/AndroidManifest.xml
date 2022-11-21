@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.sleep_soundly">
    <application
-        android:label="sleep_soundly"
+        android:label="Sleep Soundly"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity
